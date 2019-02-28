@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button saveBtn;
     private Button lookBtn;
     private Button shutdownBtn;
-    private FrameLayout contentFl;
 
     private final static int OTHER_TOOLS_SELECT_INDEX = 0;
     private final static int PEN_SIZE_SELECT_INDEX = 1;
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         saveBtn = findViewById(R.id.btn_style_save);
         lookBtn = findViewById(R.id.btn_style_look);
         shutdownBtn = findViewById(R.id.btn_style_shut_down);
-        contentFl = findViewById(R.id.fl_baiban_all_view);
         AppUtil.setTextViewBitmap(otherToolsTv, ContextCompat.getDrawable(context, R.mipmap.pen_icon_tool_int_0_nor));
         AppUtil.setTextViewBitmap(penSizeTv, ContextCompat.getDrawable(context, R.mipmap.pen_icon_pen_int_1_nor));
         AppUtil.setTextViewBitmap(penColorTv, ContextCompat.getDrawable(context, R.mipmap.pen_icon_cool_int_2_nor));
