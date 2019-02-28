@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#fff</color>
+    <color name="line_bg">#d9d9d9</color>
+    <color name="style_btn_rim">#bedde1</color>
+    <color name="style_all_common_color">#666666</color>
+    <!-- 全透明 -->
+    <color name="common_transparent">#00000000</color>
+    <color name="color_background_isselect">#D8E7F0</color>
+    <color name="style_all_pressed_color">#07aabe</color>
+</resources>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">WhiteBoardPainting</string>
+    <string name="other_tools">其它工具</string>
+    <string name="pen_size">画笔大小</string>
+    <string name="pen_color">颜色</string>
+    <string name="clear_screen">清屏</string>
+    <string name="pen_tools">笔</string>
+    <string name="xiangpi_tools">橡皮</string>
+    <string name="shut_down">关闭</string>
+    <string name="save">保存</string>
+</resources>

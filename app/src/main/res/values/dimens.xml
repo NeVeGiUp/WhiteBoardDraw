@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_common">10dp</dimen>
+    <dimen name="activity_horizontal_small">5dp</dimen>
+    <dimen name="style_btn_text_size">13sp</dimen>
+    <dimen name="style_select_grid_samll">55dp</dimen>
+    <dimen name="style_select_grid">166dp</dimen>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/list_item_style_pup_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/common_transparent"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_margin="@dimen/activity_horizontal_small"
+        android:contentDescription="@null"/>
+</FrameLayout>

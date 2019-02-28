@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/fl_baiban_all_view"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ligh.whiteboardpainting.MainActivity"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--   以下自定义画布View    -->
+    <com.ligh.whiteboardpainting.widget.SketchpadView
+        android:id="@+id/sketchpad_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:background="@color/white" />
+
+    <!-- 以下可移动的样式控制器   -->
+    <LinearLayout
+        android:id="@+id/ll_style_controller"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_style_move"
+            android:contentDescription="@null"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_common"
+            android:src="@mipmap/pen_icon_move_nor" />
+
+        <ImageView
+            android:id="@+id/iv_style_pen"
+            style="@style/StyleBaseAttr"
+            android:contentDescription="@null"
+            android:src="@mipmap/pen_icon_pen_hig" />
+
+        <ImageView
+            android:id="@+id/iv_style_eraser"
+            style="@style/StyleBaseAttr"
+            android:contentDescription="@null"
+            android:src="@mipmap/pen_ocon_eraser_nor" />
+
+        <TextView
+            android:id="@+id/tv_style_other_tools"
+            style="@style/StyleBaseAttr"
+            android:gravity="center_horizontal"
+            android:text="@string/other_tools"
+            android:maxLines="1"
+            android:drawablePadding="@dimen/activity_horizontal_small" />
+
+        <TextView
+            android:id="@+id/tv_style_pen_size"
+            style="@style/StyleBaseAttr"
+            android:text="@string/pen_size"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:drawablePadding="@dimen/activity_horizontal_small" />
+
+        <TextView
+            android:id="@+id/tv_style_pen_color"
+            style="@style/StyleBaseAttr"
+            android:text="@string/pen_color"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:drawablePadding="@dimen/activity_horizontal_small" />
+
+        <Button
+            android:id="@+id/btn_style_save"
+            style="@style/ButtonStyleBaseAttr"
+            android:text="@string/save"/>
+
+        <Button
+            android:id="@+id/btn_style_look"
+            style="@style/ButtonStyleBaseAttr"
+            android:text="@string/clear_screen"/>
+
+        <Button
+            android:id="@+id/btn_style_shut_down"
+            style="@style/ButtonStyleBaseAttr"
+            android:text="@string/shut_down"/>
+
+    </LinearLayout>
+
+</FrameLayout>
