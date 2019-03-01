@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.ligh.whiteboardpainting.listener.ASketchpadDraw;
 import com.ligh.whiteboardpainting.utils.AppUtil;
 import com.ligh.whiteboardpainting.R;
-import com.ligh.whiteboardpainting.widget.SketchpadView;
+import com.ligh.whiteboardpainting.widget.DrawingBoardView;
 import com.ligh.whiteboardpainting.model.StyleObjAttr;
 
 import java.util.regex.Matcher;
@@ -31,13 +31,13 @@ public class TextCtl extends ASketchpadDraw {
     private boolean isSelf;
     private Context context;
     private FrameLayout parentView;
-    private SketchpadView view;
+    private DrawingBoardView view;
     private StyleObjAttr textAttr;
     private Paint mPaint = new Paint();
     private int height;
     private int penColor;
 
-    public TextCtl(Context context, SketchpadView view, int penColor) {
+    public TextCtl(Context context, DrawingBoardView view, int penColor) {
         this.context = context;
         this.parentView = (FrameLayout) view.getParent();
         this.view = view;
@@ -69,7 +69,7 @@ public class TextCtl extends ASketchpadDraw {
 
     @Override
     public void touchDown(float x, float y) {
-        SketchpadView.requestFocus(parentView);
+        DrawingBoardView.requestFocus(parentView);
     }
 
     private EditText editText;
@@ -94,7 +94,7 @@ public class TextCtl extends ASketchpadDraw {
         params.width = FrameLayout.LayoutParams.WRAP_CONTENT;
         editText = new EditText(context);
         editText.setHint("请输入...");
-        editText.setTextColor(SketchpadView.getStrokeColor());
+        editText.setTextColor(DrawingBoardView.getStrokeColor());
         editText.setFocusableInTouchMode(true);
         editText.requestFocus();
         editText.setTextColor(penColor);

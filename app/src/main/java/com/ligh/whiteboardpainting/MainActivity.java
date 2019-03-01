@@ -3,6 +3,8 @@ package com.ligh.whiteboardpainting;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
@@ -27,12 +29,12 @@ import com.ligh.whiteboardpainting.adapter.StyleSelectBaseAdapter;
 import com.ligh.whiteboardpainting.utils.AppUtil;
 import com.ligh.whiteboardpainting.utils.ConfigUtil;
 import com.ligh.whiteboardpainting.utils.ScreenUtil;
-import com.ligh.whiteboardpainting.widget.SketchpadView;
+import com.ligh.whiteboardpainting.widget.DrawingBoardView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Context context;
-    private SketchpadView sketchpadView;
+    private DrawingBoardView drawingBoardView;
     private LinearLayout controllerLl;
     private ImageView moveIv;
     private ImageView penIv;
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //横屏
         initView();
-        sketchpadView.initialize(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this));
+        drawingBoardView.initialize(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this),new Canvas(),new Paint(Paint.ANTI_ALIAS_FLAG));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         }
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @SuppressLint("WrongViewCast")
     private void initView() {
         controllerLl = findViewById(R.id.ll_style_controller);
-        sketchpadView = findViewById(R.id.sketchpad_view);
+        drawingBoardView = findViewById(R.id.sketchpad_view);
         moveIv = findViewById(R.id.iv_style_move);
         penIv = findViewById(R.id.iv_style_pen);
         eraserIv = findViewById(R.id.iv_style_eraser);
@@ -100,9 +102,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sketchpadView.recycleBitmap();
-        sketchpadView.objStack.clearAll(false);
-        sketchpadView = null;
+        drawingBoardView.recycleBitmap();
+        drawingBoardView.objStack.clearAll(false);
+        drawingBoardView = null;
     }
 
 
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     isPenClickChangeColor = false;
                     isEraserClickChangeColor = true;
                 }
-                sketchpadView.setStrokeType(SketchpadView.STYLE_PEN);
+                drawingBoardView.setStrokeType(DrawingBoardView.STYLE_PEN);
                 break;
             case R.id.iv_style_eraser:  //橡皮擦
                 if (isEraserClickChangeColor) {
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     isEraserClickChangeColor = false;
                     isPenClickChangeColor = true;
                 }
-                sketchpadView.setStrokeType(SketchpadView.STYLE_ERASER);
+                drawingBoardView.setStrokeType(DrawingBoardView.STYLE_ERASER);
                 break;
             case R.id.tv_style_other_tools:  //其它工具
                 showPupopWindow(otherToolsTv, R.layout.style_pupopwindow_grid, OTHER_TOOLS_SELECT_INDEX, ConfigUtil.styleSelect);
@@ -145,13 +147,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_style_save:  //保存按钮
                 break;
             case R.id.btn_style_look:  //清屏
-                sketchpadView.objStack.clearPageDraw(-1, true);
+                drawingBoardView.objStack.clearPageDraw(-1, true);
                 break;
             case R.id.btn_style_shut_down:  //关闭
                 exitActivity();
                 break;
         }
-        SketchpadView.requestFocus(controllerLl);
+        DrawingBoardView.requestFocus(controllerLl);
     }
 
 
@@ -211,22 +213,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case OTHER_TOOLS_SELECT_INDEX://其它工具选择的结果
                     switch (position) {
                         case 0://文字编辑
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_TEXT);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_TEXT);
                             break;
                         case 1://直线
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_LINE);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_LINE);
                             break;
                         case 2://矩形
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_RECT);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_RECT);
                             break;
                         case 3://实心矩形
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_FILL_RECT);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_FILL_RECT);
                             break;
                         case 4://椭圆
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_OVAL);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_OVAL);
                             break;
                         case 5://实心椭圆
-                            sketchpadView.setStrokeType(SketchpadView.STYLE_FILL_OVAL);
+                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_FILL_OVAL);
                             break;
                     }
                     isPenClickChangeColor = true;
@@ -236,10 +238,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     otherToolsTv.setTextColor(ContextCompat.getColor(context, R.color.style_all_pressed_color));
                     break;
                 case PEN_SIZE_SELECT_INDEX://画笔大小的选择
-                    sketchpadView.setPenSize(ConfigUtil.sizeSelctValue[position]);//根据position取Map里的相应数据
+                    drawingBoardView.setPenSize(ConfigUtil.sizeSelctValue[position]);//根据position取Map里的相应数据
                     break;
                 case PEN_COLOR_SELECT_INDEX://画笔颜色的选择
-                    sketchpadView.setStrokeColor(ConfigUtil.colorSelctValue[position]);
+                    drawingBoardView.setStrokeColor(ConfigUtil.colorSelctValue[position]);
                     break;
             }
 
@@ -316,8 +318,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void exitActivity() {
-        sketchpadView.recycleBitmap();  //释放资源
-        sketchpadView.objStack.clearAll(false);
+        drawingBoardView.recycleBitmap();  //释放资源
+        drawingBoardView.objStack.clearAll(false);
         this.finish();
         System.gc();
     }

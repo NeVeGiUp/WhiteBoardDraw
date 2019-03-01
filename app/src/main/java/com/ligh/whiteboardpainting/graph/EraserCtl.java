@@ -10,7 +10,7 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import com.ligh.whiteboardpainting.listener.ASketchpadDraw;
-import com.ligh.whiteboardpainting.widget.SketchpadView;
+import com.ligh.whiteboardpainting.widget.DrawingBoardView;
 import com.ligh.whiteboardpainting.model.StyleObjAttr;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class EraserCtl extends ASketchpadDraw {
 	private final static int ERASER_PAINT_SIZE = 3;
 	private Context context;
-	private SketchpadView view;
+	private DrawingBoardView view;
 	private  boolean isSelf;
 	private Paint mPaint = new Paint();
 	private float startx = 0;
@@ -30,7 +30,7 @@ public class EraserCtl extends ASketchpadDraw {
 	private StyleObjAttr eraserAttr = new StyleObjAttr();
 	private RectF rect = new RectF();
 
-	public EraserCtl(Context context, SketchpadView view, boolean isSelf){
+	public EraserCtl(Context context, DrawingBoardView view, boolean isSelf){
 		this.context = context;
 		this.view = view;
 		this.isSelf = isSelf;

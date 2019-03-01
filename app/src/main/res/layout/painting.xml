@@ -7,12 +7,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--   以下自定义画布View    -->
-    <com.ligh.whiteboardpainting.widget.SketchpadView
+    <com.ligh.whiteboardpainting.widget.DrawingBoardView
         android:id="@+id/sketchpad_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:background="@color/white" />
+        android:background="@color/common_transparent" />
 
     <!-- 以下可移动的样式控制器   -->
     <LinearLayout
