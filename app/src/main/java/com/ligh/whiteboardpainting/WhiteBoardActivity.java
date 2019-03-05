@@ -17,25 +17,38 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.ligh.whiteboardpainting.adapter.StyleSelectBaseAdapter;
+import com.ligh.whiteboardpainting.model.MoveEvent;
 import com.ligh.whiteboardpainting.utils.AppUtil;
 import com.ligh.whiteboardpainting.utils.ConfigUtil;
 import com.ligh.whiteboardpainting.utils.ScreenUtil;
-import com.ligh.whiteboardpainting.widget.DrawingBoardView;
+import com.ligh.whiteboardpainting.widget.WhiteBoardView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class WhiteBoardActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "WhiteBoardActivity";
 
     private Context context;
-    private DrawingBoardView drawingBoardView;
+    private WhiteBoardView whiteBoardView;
     private LinearLayout controllerLl;
+    private FrameLayout controllerFl;
     private ImageView moveIv;
     private ImageView penIv;
     private ImageView eraserIv;
@@ -45,10 +58,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button saveBtn;
     private Button lookBtn;
     private Button shutdownBtn;
+    private ListView lv;
 
     private final static int OTHER_TOOLS_SELECT_INDEX = 0;
     private final static int PEN_SIZE_SELECT_INDEX = 1;
     private final static int PEN_COLOR_SELECT_INDEX = 2;
+
+    private Canvas canvas;
+
 
     private MediaProjectionManager projectionManager;
 
@@ -56,19 +73,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        context = this;
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //横屏
         initView();
-        drawingBoardView.initialize(ScreenUtil.getScreenWidth(this), ScreenUtil.getScreenHeight(this),new Canvas(),new Paint(Paint.ANTI_ALIAS_FLAG));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
-        }
+        initData();
     }
 
     @SuppressLint("WrongViewCast")
     private void initView() {
+        EventBus.getDefault().register(this);
+        context = this;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);  //横屏
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        }
+
+        canvas = new Canvas();
+        lv = findViewById(R.id.lv);
+        controllerFl = findViewById(R.id.fl_baiban_all_view);
         controllerLl = findViewById(R.id.ll_style_controller);
-        drawingBoardView = findViewById(R.id.sketchpad_view);
+        whiteBoardView = findViewById(R.id.sketchpad_view);
         moveIv = findViewById(R.id.iv_style_move);
         penIv = findViewById(R.id.iv_style_pen);
         eraserIv = findViewById(R.id.iv_style_eraser);
@@ -99,14 +122,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        drawingBoardView.recycleBitmap();
-        drawingBoardView.objStack.clearAll(false);
-        drawingBoardView = null;
+    private void initData() {
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            strings.add("                                 " +
+                    "PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览 PDF 浏览");
+        }
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, strings);
+        lv.setAdapter(adapter);
+
+        //初始化画板参数
+        whiteBoardView.initialize(ScreenUtil.getScreenWidth(this),
+                ScreenUtil.getScreenHeight(this), canvas, new Paint(Paint.ANTI_ALIAS_FLAG));
     }
 
+    /**
+     * 双指滑动监听回调
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMoveEvent(MoveEvent event) {
+//        controllerFl.setVisibility(View.GONE);
+        lv.scrollTo(event.getEventX(),event.getEventY());
+        Log.d(TAG, "onMoveEvent: 监听到双指操作！！！！！");
+
+    }
 
     private boolean isPenClickChangeColor = false;
     private boolean isEraserClickChangeColor = true;
@@ -122,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     isPenClickChangeColor = false;
                     isEraserClickChangeColor = true;
                 }
-                drawingBoardView.setStrokeType(DrawingBoardView.STYLE_PEN);
+                whiteBoardView.setStrokeType(WhiteBoardView.STYLE_PEN);
                 break;
             case R.id.iv_style_eraser:  //橡皮擦
                 if (isEraserClickChangeColor) {
@@ -132,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     isEraserClickChangeColor = false;
                     isPenClickChangeColor = true;
                 }
-                drawingBoardView.setStrokeType(DrawingBoardView.STYLE_ERASER);
+                whiteBoardView.setStrokeType(WhiteBoardView.STYLE_ERASER);
                 break;
             case R.id.tv_style_other_tools:  //其它工具
                 showPupopWindow(otherToolsTv, R.layout.style_pupopwindow_grid, OTHER_TOOLS_SELECT_INDEX, ConfigUtil.styleSelect);
@@ -147,13 +188,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_style_save:  //保存按钮
                 break;
             case R.id.btn_style_look:  //清屏
-                drawingBoardView.objStack.clearPageDraw(-1, true);
+                whiteBoardView.objStack.clearPageDraw(-1, true);
                 break;
             case R.id.btn_style_shut_down:  //关闭
                 exitActivity();
                 break;
         }
-        DrawingBoardView.requestFocus(controllerLl);
+        WhiteBoardView.requestFocus(controllerLl);
     }
 
 
@@ -213,22 +254,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case OTHER_TOOLS_SELECT_INDEX://其它工具选择的结果
                     switch (position) {
                         case 0://文字编辑
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_TEXT);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_TEXT);
                             break;
                         case 1://直线
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_LINE);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_LINE);
                             break;
                         case 2://矩形
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_RECT);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_RECT);
                             break;
                         case 3://实心矩形
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_FILL_RECT);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_FILL_RECT);
                             break;
                         case 4://椭圆
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_OVAL);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_OVAL);
                             break;
                         case 5://实心椭圆
-                            drawingBoardView.setStrokeType(DrawingBoardView.STYLE_FILL_OVAL);
+                            whiteBoardView.setStrokeType(WhiteBoardView.STYLE_FILL_OVAL);
                             break;
                     }
                     isPenClickChangeColor = true;
@@ -238,10 +279,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     otherToolsTv.setTextColor(ContextCompat.getColor(context, R.color.style_all_pressed_color));
                     break;
                 case PEN_SIZE_SELECT_INDEX://画笔大小的选择
-                    drawingBoardView.setPenSize(ConfigUtil.sizeSelctValue[position]);//根据position取Map里的相应数据
+                    whiteBoardView.setPenSize(ConfigUtil.sizeSelctValue[position]);//根据position取Map里的相应数据
                     break;
                 case PEN_COLOR_SELECT_INDEX://画笔颜色的选择
-                    drawingBoardView.setStrokeColor(ConfigUtil.colorSelctValue[position]);
+                    whiteBoardView.setStrokeColor(ConfigUtil.colorSelctValue[position]);
                     break;
             }
 
@@ -318,10 +359,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void exitActivity() {
-        drawingBoardView.recycleBitmap();  //释放资源
-        drawingBoardView.objStack.clearAll(false);
+        whiteBoardView.recycleBitmap();  //释放资源
+        whiteBoardView.objStack.clearAll(false);
         this.finish();
         System.gc();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        whiteBoardView.recycleBitmap();
+        whiteBoardView.objStack.clearAll(false);
+        whiteBoardView = null;
     }
 
 

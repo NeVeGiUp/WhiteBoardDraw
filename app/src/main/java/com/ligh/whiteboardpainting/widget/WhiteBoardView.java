@@ -19,41 +19,44 @@ import com.ligh.whiteboardpainting.graph.PenCtl;
 import com.ligh.whiteboardpainting.graph.RectCtl;
 import com.ligh.whiteboardpainting.graph.TextCtl;
 import com.ligh.whiteboardpainting.listener.ISketchpadDraw;
+import com.ligh.whiteboardpainting.model.MoveEvent;
 import com.ligh.whiteboardpainting.model.StyleObjAttr;
 import com.ligh.whiteboardpainting.utils.ConfigUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 /**
  * 自定义画板，实现图形的绘制与显示
  */
 
-public class DrawingBoardView extends View {
+public class WhiteBoardView extends View {
 
     //设置画笔常量
-    public static final int STYLE_PEN = 1;                   //画笔
-    public static final int STYLE_ERASER = 2;                //橡皮擦
-    public static final int STYLE_TEXT = 3;                  //文字编辑
-    public static final int STYLE_FILL_RECT = 4;             //实心矩形
-    public static final int STYLE_RECT = 5;                  //矩形
-    public static final int STYLE_OVAL = 6;                  //椭圆
-    public static final int STYLE_FILL_OVAL = 7;             //实心椭圆
-    public static final int STYLE_LINE = 8;                  //直线
-    private static int BITMAP_WIDTH = 0;                     //画布高
-    private static int BITMAP_HEIGHT = 0;                    //画布宽
-    private int strokeType = STYLE_PEN;                      //画笔风格
+    public static final int STYLE_PEN = 1;                             //画笔
+    public static final int STYLE_ERASER = 2;                          //橡皮擦
+    public static final int STYLE_TEXT = 3;                            //文字编辑
+    public static final int STYLE_FILL_RECT = 4;                       //实心矩形
+    public static final int STYLE_RECT = 5;                            //矩形
+    public static final int STYLE_OVAL = 6;                            //椭圆
+    public static final int STYLE_FILL_OVAL = 7;                       //实心椭圆
+    public static final int STYLE_LINE = 8;                            //直线
+    private static int BITMAP_WIDTH = 0;                               //画布高
+    private static int BITMAP_HEIGHT = 0;                              //画布宽
+    private int strokeType = STYLE_PEN;                                //画笔风格
 
-    public boolean isSelf = false;                           //true 为交互白板, false为个人白板
-    private boolean isEnableDraw = true;                     //标记是否可以画
-    private boolean isDraw = true;                           //终端不可画
-    private boolean isTouchUp = false;                       //标记是否手指弹起
+    public boolean isSelf = false;                                     //true 为交互白板, false为个人白板
+    private boolean isEnableDraw = true;                               //标记是否可以画
+    private boolean isDraw = true;                                     //终端不可画
+    private boolean isTouchUp = false;                                 //标记是否手指弹起
 
-    private Bitmap foreBitmap = null;                        //用于显示的bitmap
-    private Bitmap bkBitmap = null;                          //用于背后画的bitmap
+    private Bitmap foreBitmap = null;                                  //用于显示的bitmap
+    private Bitmap bkBitmap = null;                                    //用于背后画的bitmap
 
     public Canvas canvas;                                              //画布
     private Paint bitmapPaint = null;                                  //画笔
 
-    public DrawingBoardStack objStack = null;                          //栈存放执行的操作
+    public WhiteBoardStack objStack = null;                          //栈存放执行的操作
     private ISketchpadDraw curTool = null;                             //记录操作的对象画笔类
 
     private static int strokeColor = Color.RED;                        //画笔颜色
@@ -85,7 +88,7 @@ public class DrawingBoardView extends View {
      * @param context
      * @param attrs
      */
-    public DrawingBoardView(Context context, AttributeSet attrs) {
+    public WhiteBoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -103,7 +106,7 @@ public class DrawingBoardView extends View {
         BITMAP_HEIGHT = height;
         this.canvas = canvas;  //实例画布用于整个绘图操作
         this.bitmapPaint = paint;  //实例化画笔用于bitmap设置画布canvas
-        objStack = new DrawingBoardStack(this);  //实例化队列
+        objStack = new WhiteBoardStack(this);  //实例化队列
         createStrokeBitmap();
         setStrokeType(strokeType);
     }
@@ -245,7 +248,8 @@ public class DrawingBoardView extends View {
                             //双指在屏幕上拖动则为非绘制状态
                         } else if (event.getPointerCount() == 2) {
                             isEnableDraw = false;
-                            //2根以上手指也是非绘制状态
+                            // TODO: 19-3-1  监听双指操作，发送广播
+                            EventBus.getDefault().post(new MoveEvent((int)-x,(int)-y));
                         } else {
                             isEnableDraw = false;
                         }
@@ -273,7 +277,7 @@ public class DrawingBoardView extends View {
                         isEnableDraw = true;
                         invalidate();
                         break;
-                    case MotionEvent.ACTION_POINTER_DOWN://一个非主要的手指按下了
+                    case MotionEvent.ACTION_POINTER_DOWN:  //一个非主要的手指按下了
                         if (event.getPointerCount() == 2) {
                             isEnableDraw = false;
                             // 当有两个手指按在屏幕上时，计算两指之间的距离
@@ -292,7 +296,7 @@ public class DrawingBoardView extends View {
                                 curTool.draw(canvas);
                         }
                         break;
-                    case MotionEvent.ACTION_POINTER_UP://一个非主要的手指抬起来了
+                    case MotionEvent.ACTION_POINTER_UP:  //一个非主要的手指抬起来了
                         break;
                 }
             }
@@ -387,7 +391,6 @@ public class DrawingBoardView extends View {
             view.requestFocus();
         }
     }
-
 
 
     public void sendData() {

@@ -23,44 +23,28 @@ import java.util.List;
  * 设置交互白板还是个人白板
  */
 
-public class DrawingBoardStack {
+public class WhiteBoardStack {
 
 
-    public DrawingBoardView sketchPad;                          //视图对象
+    public WhiteBoardView sketchPad;                          //视图对象
     private List<Integer> eraserId = new ArrayList<>();         //整理传递来的所有需要删除的对象id
     List<StyleObjAttr.SavePointModel> generatePoint;
 
 
-    public DrawingBoardStack(DrawingBoardView sketchPad) {
+    public WhiteBoardStack(WhiteBoardView sketchPad) {
         this.sketchPad = sketchPad;
     }
 
 
     /**
-     * 清空栈
+     * 对点生成的前提是手指画出的系统所记录的点的机制——按照曲线幅度大小生成系统点的多少...
+     * 然后用系统生成的相邻两点，生成中心点，递归，直到出现相同点递归完毕
      *
-     * @param isReDraw 是否重绘
+     * @param startx
+     * @param starty
+     * @param endx
+     * @param endy
      */
-    public void clearAll(boolean isReDraw) {
-        int size = ISketchpadDraw.attrStack.size();
-//            boolean isOpenWay = getContext() instanceof BaiBanCheckImageActivity;
-        for (int i = size - 1; i >= 0; i--) {
-            //true  文档页的绘制信息清除
-               /* if(isOpenWay) {
-                    if(ISketchpadDraw.attrStack.get(i).getFilePage() != -1)
-                        ISketchpadDraw.attrStack.remove(i);
-                    //白板页的绘制信息清除
-                }else{*/
-            if (ISketchpadDraw.attrStack.get(i).getFilePage() == -1)
-                ISketchpadDraw.attrStack.remove(i);
-//                }
-        }
-        if (isReDraw)
-            reDraw();
-    }
-
-
-    //对点生成的前提是手指画出的系统所记录的点的机制——按照曲线幅度大小生成系统点的多少...然后用系统生成的相邻两点，生成中心点，递归，直到出现相同点递归完毕
     private void getGeneratePoint(int startx, int starty, int endx, int endy) {
         int length = (int) Math.sqrt(Math.pow((startx - endx), 2) + Math.pow((starty - endy), 2)) / 10;//等分点成对，再取长度的1/5个等分点
         int centerx = (startx + endx) / 2;
@@ -177,8 +161,34 @@ public class DrawingBoardStack {
         return delObjectIndex;
     }
 
+
+    /**
+     * 清空栈
+     *
+     * @param isReDraw 是否重绘
+     */
+    public void clearAll(boolean isReDraw) {
+        int size = ISketchpadDraw.attrStack.size();
+//            boolean isOpenWay = getContext() instanceof BaiBanCheckImageActivity;
+        for (int i = size - 1; i >= 0; i--) {
+            //true  文档页的绘制信息清除
+               /* if(isOpenWay) {
+                    if(ISketchpadDraw.attrStack.get(i).getFilePage() != -1)
+                        ISketchpadDraw.attrStack.remove(i);
+                    //白板页的绘制信息清除
+                }else{*/
+            if (ISketchpadDraw.attrStack.get(i).getFilePage() == -1)
+                ISketchpadDraw.attrStack.remove(i);
+//                }
+        }
+        if (isReDraw)
+            reDraw();
+    }
+
+
     /**
      * page为-1则是清屏白板
+     *
      * @param page
      * @param isSend
      */

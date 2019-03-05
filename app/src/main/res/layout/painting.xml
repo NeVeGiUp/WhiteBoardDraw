@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ligh.whiteboardpainting.MainActivity"
+    tools:context="com.ligh.whiteboardpainting.WhiteBoardActivity"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--   以下自定义画布View    -->
-    <com.ligh.whiteboardpainting.widget.DrawingBoardView
+    <com.ligh.whiteboardpainting.widget.WhiteBoardView
         android:id="@+id/sketchpad_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

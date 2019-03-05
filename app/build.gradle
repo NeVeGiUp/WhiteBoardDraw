@@ -27,5 +27,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation 'com.google.code.gson:gson:2.7'
-    //Butterknife
+    implementation 'org.greenrobot:eventbus:3.0.0'
 }
